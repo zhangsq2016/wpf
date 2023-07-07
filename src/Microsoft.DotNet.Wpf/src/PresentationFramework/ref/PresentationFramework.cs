@@ -36,7 +36,7 @@ namespace Microsoft.Win32
         public event System.ComponentModel.CancelEventHandler FileOk { add { } remove { } }
         public string Filter { get { throw null; } set { } }
         public int FilterIndex { get { throw null; } set { } }
-        protected override void OnItemOk(CancelEventArgs e) { }
+        protected override void OnItemOk(System.ComponentModel.CancelEventArgs e) { }
         public override void Reset() { }
         public bool RestoreDirectory { get { throw null; } set { } }
         public string SafeFileName { get { throw null; } }
@@ -87,7 +87,7 @@ namespace Microsoft.Win32
         public string[] FolderNames { get { throw null; } }
         public event System.ComponentModel.CancelEventHandler FolderOk { add { } remove { } }
         public bool Multiselect { get { throw null; } set { } }
-        protected override void OnItemOk(CancelEventArgs e) { }
+        protected override void OnItemOk(System.ComponentModel.CancelEventArgs e) { }
         public override void Reset() { }
         public string SafeFolderName { get { throw null; } }
         public string[] SafeFolderNames { get { throw null; } }
