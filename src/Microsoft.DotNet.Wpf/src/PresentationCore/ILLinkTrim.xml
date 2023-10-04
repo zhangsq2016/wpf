@@ -3,5 +3,6 @@
        analyzed by the linker. -->
   <assembly fullname="System.Diagnostics.Debug" />
   <assembly fullname="mscorlib" />
+  <assembly fullname="System.Runtime.InteropServices" />
   <assembly fullname="netstandard" />  
 </linker>
