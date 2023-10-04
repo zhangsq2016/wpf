@@ -80,12 +80,22 @@
     -->
     <MicrosoftDotNetWpfTestPackageVersion>1.0.0-beta.19263.1</MicrosoftDotNetWpfTestPackageVersion>
     <!-- These versions are specified in global.json -->
-    <StrawberryPerlVersion>5.28.1.1-1</StrawberryPerlVersion>
+    <StrawberryPerlVersion>5.38.0.1</StrawberryPerlVersion>
     <NetFramework48RefAssembliesVersion>0.0.0.1</NetFramework48RefAssembliesVersion>
   </PropertyGroup>
   <!-- External Analyzers -->
   <PropertyGroup>
     <MicrosoftCodeAnalysisNetAnalyzersVersion>7.0.0</MicrosoftCodeAnalysisNetAnalyzersVersion>
+  </PropertyGroup>
+  <!-- Test related -->
+  <PropertyGroup>
+    <MoqPackageVersion>4.10.0</MoqPackageVersion>
+  </PropertyGroup>
+  <!-- Code Coverage -->
+  <PropertyGroup>
+    <CoverletMSBuildPackageVersion>3.1.2</CoverletMSBuildPackageVersion>
+    <CodecovVersion>1.9.0</CodecovVersion>
+    <ReportGeneratorVersion>4.0.9</ReportGeneratorVersion>
   </PropertyGroup>
   <!--Package names-->
   <PropertyGroup>
