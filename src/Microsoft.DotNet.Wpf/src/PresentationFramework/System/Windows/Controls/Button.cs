@@ -24,7 +24,7 @@ namespace System.Windows.Controls
     ///     Represents the standard button component that inherently reacts to the Click event.
     /// The Button control is one of the most basic forms of user interface (UI).
     /// </summary>
-    public class Button: ButtonBase, IIconControl
+    public class Button: ButtonBase
     {
         #region Constructors
 
@@ -232,15 +232,7 @@ namespace System.Windows.Controls
         typeof(Button),
         new PropertyMetadata(Border.BackgroundProperty.DefaultMetadata.DefaultValue)
     );
-    /// <summary>
-    /// Property for <see cref="Icon"/>.
-    /// </summary>
-    public static readonly DependencyProperty IconProperty = DependencyProperty.Register(
-        nameof(Icon),
-        typeof(IconElement),
-        typeof(Button),
-        new PropertyMetadata(null, null, IconSourceElementConverter.ConvertToIconElement)
-    );
+
     /// <summary>
     /// Property for <see cref="PressedBorderBrush"/>.
     /// </summary>
@@ -306,15 +298,7 @@ namespace System.Windows.Controls
         get => (Brush)GetValue(PressedBorderBrushProperty);
         set => SetValue(PressedBorderBrushProperty, value);
     }
-    /// <summary>
-    /// Gets or sets displayed <see cref="IconElement"/>.
-    /// </summary>
-    [Bindable(true), Category("Appearance")]
-    public IconElement Icon
-    {
-        get => (IconElement)GetValue(IconProperty);
-        set => SetValue(IconProperty, value);
-    }
+
     /// <summary>
     /// Property for <see cref="CornerRadius"/>.
     /// </summary>
