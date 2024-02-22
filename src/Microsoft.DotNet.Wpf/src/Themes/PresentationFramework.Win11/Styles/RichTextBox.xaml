@@ -11,6 +11,7 @@
 
     <Style x:Key="DefaultRichTextBoxStyle" TargetType="{x:Type RichTextBox}">
         <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+        <Setter Property="ContextMenu" Value="{DynamicResource DefaultControlContextMenu}" />
         <Setter Property="CaretBrush" Value="{DynamicResource TextControlForeground}" />
         <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}" />

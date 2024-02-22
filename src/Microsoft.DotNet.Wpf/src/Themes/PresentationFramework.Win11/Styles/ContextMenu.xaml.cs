@@ -32,7 +32,7 @@ namespace PresentationFramework.Win11.Styles
         {
             var currentAssembly = typeof(Application).Assembly;
 
-            AddEditorContextMenuDefaultStyle(currentAssembly);
+            // AddEditorContextMenuDefaultStyle(currentAssembly);
         }
 
         private void AddEditorContextMenuDefaultStyle(Assembly currentAssembly)
