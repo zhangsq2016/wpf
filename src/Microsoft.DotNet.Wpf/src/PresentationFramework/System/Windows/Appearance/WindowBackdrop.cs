@@ -4,7 +4,6 @@
 // All Rights Reserved.
 
 using System.Runtime.InteropServices;
-using System.Windows.Appearance;
 using System.Windows.Interop;
 using System.Windows.Media;
 
