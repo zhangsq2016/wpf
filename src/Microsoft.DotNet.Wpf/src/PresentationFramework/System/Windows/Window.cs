@@ -571,13 +571,13 @@ namespace System.Windows
         /// <summary>
         /// Property for <see cref="ExtendsContentIntoTitleBar"/>.
         /// </summary>
-        public static readonly DependencyProperty ExtendsContentIntoTitleBarProperty =
-            DependencyProperty.Register(
-                nameof(ExtendsContentIntoTitleBar),
-                typeof(bool),
-                typeof(Window),
-                new PropertyMetadata(false, OnExtendsContentIntoTitleBarChanged)
-            );
+        // public static readonly DependencyProperty ExtendsContentIntoTitleBarProperty =
+        //     DependencyProperty.Register(
+        //         nameof(ExtendsContentIntoTitleBar),
+        //         typeof(bool),
+        //         typeof(Window),
+        //         new PropertyMetadata(false, OnExtendsContentIntoTitleBarChanged)
+        //     );
 
         /// <summary>
         /// Gets or sets a value determining preferred backdrop type for current <see cref="Window"/>.
@@ -1945,7 +1945,7 @@ namespace System.Windows
         /// <param name="e"></param>
         protected virtual void OnSourceInitialized(EventArgs e)
         {
-            OnExtendsContentIntoTitleBarChanged(default, ExtendsContentIntoTitleBar);
+            // OnExtendsContentIntoTitleBarChanged(default, ExtendsContentIntoTitleBar);
             OnBackdropTypeChanged(default, WindowBackdropType);
 
             VerifyContextAndObjectState();
@@ -1986,10 +1986,10 @@ namespace System.Windows
                 return;
             }
 
-            if (!ExtendsContentIntoTitleBar)
-                throw new InvalidOperationException(
-                    $"Cannot apply backdrop effect if {nameof(ExtendsContentIntoTitleBar)} is false."
-                );
+            // if (!ExtendsContentIntoTitleBar)
+            //     throw new InvalidOperationException(
+            //         $"Cannot apply backdrop effect if {nameof(ExtendsContentIntoTitleBar)} is false."
+            //     );
 
             if (WindowBackdrop.IsSupported(newValue) && WindowBackdrop.RemoveBackground(this))
                 WindowBackdrop.ApplyBackdrop(this, newValue);
@@ -1998,41 +1998,63 @@ namespace System.Windows
         /// <summary>
         /// Private <see cref="ExtendsContentIntoTitleBar"/> property callback.
         /// </summary>
-        private static void OnExtendsContentIntoTitleBarChanged(
-            DependencyObject d,
-            DependencyPropertyChangedEventArgs e
-        )
-        {
-            if (d is not Window window)
-                return;
+        // private static void OnExtendsContentIntoTitleBarChanged(
+        //     DependencyObject d,
+        //     DependencyPropertyChangedEventArgs e
+        // )
+        // {
+        //     if (d is not Window window)
+        //         return;
 
-            if (e.OldValue == e.NewValue)
-                return;
+        //     if (e.OldValue == e.NewValue)
+        //         return;
 
-            window.OnExtendsContentIntoTitleBarChanged((bool)e.OldValue, (bool)e.NewValue);
-        }
+        //     window.OnExtendsContentIntoTitleBarChanged((bool)e.OldValue, (bool)e.NewValue);
+        // }
 
         /// <summary>
         /// This virtual method is called when <see cref="ExtendsContentIntoTitleBar"/> is changed.
         /// </summary>
         protected virtual void OnExtendsContentIntoTitleBarChanged(bool oldValue, bool newValue)
         {
-            WindowStyle = WindowStyle.SingleBorderWindow;
-            //AllowsTransparency = true;
+            if(newValue)
+            {
+                WindowStyle = WindowStyle.SingleBorderWindow;
+                //AllowsTransparency = true;
 
-            WindowChrome.SetWindowChrome(
-                this,
-                new WindowChrome
+                WindowChrome.SetWindowChrome(
+                    this,
+                    new WindowChrome
+                    {
+                        CaptionHeight = 0,
+                        CornerRadius = default,
+                        GlassFrameThickness = new Thickness(-1),
+                        ResizeBorderThickness = ResizeMode == ResizeMode.NoResize ? default : new Thickness(4),
+                        UseAeroCaptionButtons = false
+                    }
+                );
+
+                UnsafeNativeMethodsWindow.RemoveWindowTitlebarContents(this);
+            }
+            else
+            {
+                if(WindowBackdropType == WindowBackdropType.Mica)
                 {
-                    CaptionHeight = 0,
-                    CornerRadius = default,
-                    GlassFrameThickness = new Thickness(-1),
-                    ResizeBorderThickness = ResizeMode == ResizeMode.NoResize ? default : new Thickness(4),
-                    UseAeroCaptionButtons = false
+                    var _hwnd = new WindowInteropHelper(this).Handle;
+                    DpiScale dpi = this.GetDpi();
+                    Thickness deviceGlassThickness = Standard.DpiHelper.LogicalThicknessToDevice(new Thickness(-1), dpi.DpiScaleX, dpi.DpiScaleY);
+                    var dwmMargin = new Standard.MARGINS
+                    {
+                        // err on the side of pushing in glass an extra pixel.
+                        cxLeftWidth = (int)Math.Ceiling(deviceGlassThickness.Left),
+                        cxRightWidth = (int)Math.Ceiling(deviceGlassThickness.Right),
+                        cyTopHeight = (int)Math.Ceiling(deviceGlassThickness.Top),
+                        cyBottomHeight = (int)Math.Ceiling(deviceGlassThickness.Bottom),
+                    };                    
+                    Dwmapi.DwmExtendFrameIntoClientArea(_hwnd, ref dwmMargin);
                 }
-            );
+            }
 
-            UnsafeNativeMethodsWindow.RemoveWindowTitlebarContents(this);
             ////WindowStyleProperty.OverrideMetadata(typeof(FluentWindow), new FrameworkPropertyMetadata(WindowStyle.SingleBorderWindow));
             ////AllowsTransparencyProperty.OverrideMetadata(typeof(FluentWindow), new FrameworkPropertyMetadata(false));
         }
