@@ -358,10 +358,14 @@
                                     Focusable="False"
                                     Foreground="{DynamicResource CalendarViewButtonForeground}">
                                     <Button.Content>
-                                        <FontIcon
+                                        <!-- <FontIcon
                                             FontFamily="Segoe Fluent Icons"
                                             FontSize="8"
-                                            Glyph="{StaticResource CaretUpGlyph}" />
+                                            Glyph="{StaticResource CaretUpGlyph}" /> -->
+                                        <TextBlock
+                                            FontSize="8"
+                                            FontFamily="Segoe Fluent Icons"
+                                            >&#xEDDB;</TextBlock>
                                     </Button.Content>
                                 </Button>
                                 <Button
@@ -378,10 +382,14 @@
                                     Focusable="False"
                                     Foreground="{DynamicResource CalendarViewButtonForeground}">
                                     <Button.Content>
-                                        <FontIcon
+                                        <!-- <FontIcon
                                             FontFamily="Segoe Fluent Icons"
                                             FontSize="8"
-                                            Glyph="{StaticResource CaretDownGlyph}" />
+                                            Glyph="{StaticResource CaretDownGlyph}" /> -->
+                                        <TextBlock
+                                            FontSize="8"
+                                            FontFamily="Segoe Fluent Icons"
+                                            >&#xEDDC;</TextBlock>
                                     </Button.Content>
                                 </Button>
                             </Grid>
