@@ -242,15 +242,23 @@
                 <Setter TargetName="ClearButton" Property="Margin" Value="0" />
                 <Setter TargetName="PlaceholderTextBox" Property="Visibility" Value="Visible" />
             </Trigger>
-            <!-- <Trigger Property="ClearButtonEnabled" Value="False">
-                <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed" />
-                <Setter TargetName="ClearButton" Property="Margin" Value="0" />
-            </Trigger> -->
             <Trigger Property="IsFocused" Value="True">
                 <Setter TargetName="AccentBorder" Property="BorderThickness" Value="0,0,0,2" />
                 <Setter TargetName="AccentBorder" Property="BorderBrush" Value="{DynamicResource TextControlFocusedBorderBrush}" />
-                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource TextControlBackgroundFocused}" />
+                <Setter TargetName="ContentBorder" Property="Background" Value="{DynamicResource TextControlBackgroundFocused}" />   
             </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="False">
+                <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                <Setter TargetName="ClearButton" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="Text" Value="{x:Static system:String.Empty}">
+                <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="ClearButton" Property="Margin" Value="0" />
+            </Trigger>
+           
+                        
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsEnabled" Value="True" />
@@ -272,7 +280,6 @@
                 <Setter TargetName="AccentBorder" Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushDisabled}" />
                 <Setter TargetName="PlaceholderTextBox" Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}" />
                 <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}" />
-                <!-- <Setter Property="ClearButtonEnabled" Value="False" /> -->
                 <Setter TargetName="ClearButton" Property="Visibility" Value="Collapsed" />
                 <Setter TargetName="ClearButton" Property="Margin" Value="0" />
 
@@ -337,24 +344,10 @@
         <Setter Property="MinWidth" Value="{DynamicResource TextControlThemeMinWidth}" />
         <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
         <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
-        <!-- <Setter Property="ClearButtonEnabled" Value="True" /> -->
-        <!-- <Setter Property="IconPlacement" Value="Left" /> -->
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Template" Value="{StaticResource DefaultUiTextBoxControlTemplate}" />
-        <!-- <Style.Triggers>
-            <Trigger Property="IsTextSelectionEnabled" Value="False">
-                
-            </Trigger>
-            <Trigger Property="IsTextSelectionEnabled" Value="True">
-                <Setter Property="IsReadOnly" Value="True" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="Padding" Value="0" />
-                <Setter Property="BorderBrush" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Template" Value="{StaticResource DefaultUiTextBoxTextSelectionEnabledControlTemplate}" />
-            </Trigger>
-        </Style.Triggers> -->
+        
     </Style>
 
     <Style BasedOn="{StaticResource DefaultTextBoxBaseStyle}" TargetType="{x:Type TextBoxBase}" />

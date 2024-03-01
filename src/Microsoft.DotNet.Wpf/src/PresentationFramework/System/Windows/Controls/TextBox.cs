@@ -980,15 +980,15 @@ namespace System.Windows.Controls
         );
 
 
-        /// <summary>
-        /// Property for <see cref="ClearButtonEnabled"/>.
-        /// </summary>
-        internal static readonly DependencyProperty ClearButtonEnabledProperty = DependencyProperty.Register(
-            nameof(ClearButtonEnabled),
-            typeof(bool),
-            typeof(TextBox),
-            new PropertyMetadata(false)
-        );
+        // /// <summary>
+        // /// Property for <see cref="ClearButtonEnabled"/>.
+        // /// </summary>
+        // internal static readonly DependencyProperty ClearButtonEnabledProperty = DependencyProperty.Register(
+        //     nameof(ClearButtonEnabled),
+        //     typeof(bool),
+        //     typeof(TextBox),
+        //     new PropertyMetadata(true)
+        // );
 
 
         /// <summary>
@@ -1013,14 +1013,14 @@ namespace System.Windows.Controls
         }
 
 
-        /// <summary>
-        /// Gets or sets a value determining whether to enable the clear button.
-        /// </summary>
-        internal bool ClearButtonEnabled
-        {
-            get => (bool)GetValue(ClearButtonEnabledProperty);
-            set => SetValue(ClearButtonEnabledProperty, value);
-        }
+        // /// <summary>
+        // /// Gets or sets a value determining whether to enable the clear button.
+        // /// </summary>
+        // internal bool ClearButtonEnabled
+        // {
+        //     get => (bool)GetValue(ClearButtonEnabledProperty);
+        //     set => SetValue(ClearButtonEnabledProperty, value);
+        // }
 
         /// <summary>
         /// Command triggered after clicking the button.
@@ -1032,51 +1032,48 @@ namespace System.Windows.Controls
 
 
         /// <inheritdoc />
-        protected override void OnTextChanged(TextChangedEventArgs e)
-        {
-            base.OnTextChanged(e);
+        // protected override void OnTextChanged(TextChangedEventArgs e)
+        // {
+        //     base.OnTextChanged(e);
 
 
-            RevealClearButton();
-        }
-
-        /// <inheritdoc />
-        protected override void OnGotFocus(RoutedEventArgs e)
-        {
-            base.OnGotFocus(e);
-
-            CaretIndex = Text.Length;
-
-            RevealClearButton();
-        }
+        //     // RevealClearButton();
+        // }
 
         /// <inheritdoc />
-        protected override void OnLostFocus(RoutedEventArgs e)
-        {
-            base.OnLostFocus(e);
+        // protected override void OnGotFocus(RoutedEventArgs e)
+        // {
+        //     base.OnGotFocus(e);
+        //     RevealClearButton();
+        // }
 
-            HideClearButton();
-        }
+        // /// <inheritdoc />
+        // protected override void OnLostFocus(RoutedEventArgs e)
+        // {
+        //     base.OnLostFocus(e);
+
+        //     HideClearButton();
+        // }
 
         /// <summary>
         /// Reveals the clear button by <see cref="ClearButtonEnabled"/> property.
         /// </summary>
-        internal void RevealClearButton()
-        {
-            if (IsKeyboardFocusWithin)
-            {
-                ClearButtonEnabled = Text.Length > 0;
-            }
-        }
+        // internal void RevealClearButton()
+        // {
+        //     if (IsKeyboardFocusWithin)
+        //     {
+        //         ClearButtonEnabled = Text.Length > 0;
+        //     }
+        // }
 
-        /// <summary>
-        /// Hides the clear button by <see cref="ClearButtonEnabled"/> property.
-        /// </summary>
-        internal void HideClearButton()
-        {
-            if (ClearButtonEnabled && !IsKeyboardFocusWithin)
-                ClearButtonEnabled = false;
-        }
+        // /// <summary>
+        // /// Hides the clear button by <see cref="ClearButtonEnabled"/> property.
+        // /// </summary>
+        // internal void HideClearButton()
+        // {
+        //     if (ClearButtonEnabled && !IsKeyboardFocusWithin)
+        //         ClearButtonEnabled = false;
+        // }
 
         /// <summary>
         /// Triggered when the user clicks the clear text button.
@@ -1092,8 +1089,7 @@ namespace System.Windows.Controls
         {
             if (target is TextBox textBox)
             {
-                args.CanExecute = textBox.ClearButtonEnabled
-                                    && !textBox.IsReadOnly
+                args.CanExecute =  !textBox.IsReadOnly
                                     && textBox.IsEnabled
                                     && textBox.Text.Length > 0;
             }
