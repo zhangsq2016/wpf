@@ -1036,18 +1036,6 @@ namespace System.Windows.Controls
         {
             base.OnTextChanged(e);
 
-            if (PlaceholderText != string.Empty && Text.Length > 0)
-            {
-                _placeholderText = PlaceholderText;
-                PlaceholderText = string.Empty;
-            }
-                
-
-            if (_placeholderText != string.Empty && Text.Length < 1)
-            {
-                PlaceholderText = _placeholderText;
-                _placeholderText = string.Empty;
-            }
 
             RevealClearButton();
         }
@@ -2097,7 +2085,6 @@ namespace System.Windows.Controls
         // depth of nested calls to OnTextContainerChanged.
         private int _changeEventNestingCount;
 
-        private string _placeholderText;
 
         #endregion Private Fields
     }
