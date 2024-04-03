@@ -11,7 +11,7 @@
 
     <Style TargetType="{x:Type TextBlock}">
 
-        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+        <!-- <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/> -->
 
         <!--  The Display option causes a large aliasing effect  -->
         <!--<Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />-->
@@ -24,12 +24,12 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
     </Style>
 
-    <DataTemplate DataType="{x:Type sys:String}">
+    <!-- <DataTemplate DataType="{x:Type sys:String}">
         <TextBlock Text="{Binding}">
             <TextBlock.Resources>
                 <Style TargetType="{x:Type TextBlock}"/>
             </TextBlock.Resources>
         </TextBlock>
-    </DataTemplate>
+    </DataTemplate> -->
 
 </ResourceDictionary>

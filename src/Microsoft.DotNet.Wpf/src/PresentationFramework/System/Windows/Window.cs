@@ -3551,6 +3551,12 @@ namespace System.Windows
                     App.NonAppWindowsInternal.Add(this);
                 }
             }
+
+            // TODO : Remove when FluentWindows theme is enabled by default
+            if (ThemeManager.IsFluentWindowsThemeEnabled)
+            {
+                SetResourceReference(StyleProperty, typeof(Window));
+            }
         }
 
 
