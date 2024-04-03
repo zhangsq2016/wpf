@@ -2511,26 +2511,21 @@ namespace System.Windows
                 UnsafeNativeMethods.ChangeWindowMessageFilterEx(_swh.CriticalHandle, WindowMessage.WM_COMMAND, MSGFLT.ALLOW, out info);
             }
 
-            if (Standard.Utility.IsOSWindows11OrNewer && ThemeColorization.IsFluentWindowsThemeEnabled)
+            if (Standard.Utility.IsOSWindows11OrNewer && ThemeManager.IsFluentWindowsThemeEnabled)
             {
-                ResourceDictionary themeDictionary = new ResourceDictionary();
+                var themeColorFileName = ThemeManager.GetUseLightTheme() ? "light.xaml" : "dark.xaml";
+                ResourceDictionary themeDictionary = new ResourceDictionary() 
+                    { Source = new Uri($"pack://application:,,,/PresentationFramework.FluentWindows;component/resources/theme/{themeColorFileName}", 
+                                            UriKind.Absolute) };
 
-                if(ThemeColorization.IsThemeDark())
-                {
-                    themeDictionary.Source = new Uri("pack://application:,,,/PresentationFramework.FluentWindows;component/resources/theme/dark.xaml", UriKind.Absolute);
-                }
-                else 
-                {
-                    themeDictionary.Source = new Uri("pack://application:,,,/PresentationFramework.FluentWindows;component/resources/theme/light.xaml", UriKind.Absolute);
-                }
-
-                ThemeColorization.AddThemeDictionary(themeDictionary);
+                ThemeManager.AddFluentWindowsThemeDictionary(themeDictionary);
+                ThemeManager.ApplySystemTheme(this, true);
 
                 // Initializing the application window with current system theme
                 // This is one time initialization that updates the resourcedictionary and 
                 // calls WindowBackgroundManager to update its Background based on current SystemTheme
-                DwmColorization.UpdateAccentColors();
-                ThemeColorization.ApplyTheme(this);
+                // DwmColorization.UpdateAccentColors();
+                // ThemeColorization.ApplyTheme(this);
             }
 
             // Sub classes can have different intialization. RBW does very minimalistic

@@ -84,7 +84,7 @@ internal static class DwmColorization
         Color secondaryAccent;
         Color tertiaryAccent;
 
-        bool isDarkTheme = ThemeColorization.IsThemeDark();
+        bool isDarkTheme = !ThemeManager.GetUseLightTheme();
         bool isHighContrastEnabled = SystemParameters.HighContrast;
 
         IMMERSIVE_COLOR_PREFERENCE colorPreference = new IMMERSIVE_COLOR_PREFERENCE();
@@ -147,7 +147,7 @@ internal static class DwmColorization
             .WriteLine("INFO | SystemAccentColorTertiary: " + tertiaryAccent, "System.Windows.Accent");
 #endif
 
-        if (ThemeColorization.IsThemeDark())
+        if (!ThemeManager.GetUseLightTheme())
         {
 #if DEBUG
             System.Diagnostics.Debug.WriteLine("INFO | Text on accent is DARK", "System.Windows.Accent");
