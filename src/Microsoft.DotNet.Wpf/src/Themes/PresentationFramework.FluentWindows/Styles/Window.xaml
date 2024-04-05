@@ -74,6 +74,9 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="BackdropDisabledWindowStyle" BasedOn="{StaticResource DefaultWindowStyle}" TargetType="{x:Type Window}" >
+        <Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+    </Style>
 
     <Style BasedOn="{StaticResource DefaultWindowStyle}" TargetType="{x:Type Window}" />
 

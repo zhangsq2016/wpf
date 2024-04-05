@@ -82,7 +82,7 @@ internal static class ThemeManager
             foreach(Window window in windows)
             {
                 SetImmersiveDarkMode(window, !requestedUseLightMode);
-                WindowBackdropManager.SetBackdrop(window, backdropType);
+                window.WindowBackdropType = backdropType;
             }
 
             _currentApplicationTheme = requestedTheme;

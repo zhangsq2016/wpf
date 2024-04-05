@@ -1,14 +1,15 @@
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using System.Windows.Media;
-
+using MS.Internal;
 using Standard;
+using HRESULT = Standard.HRESULT;
+
 // ReSharper disable once CheckNamespace
 namespace System.Windows.Appearance;
 
 internal static class WindowBackdropManager
 {
-
     internal static bool IsSupported(WindowBackdropType backdropType)
     {
         return backdropType switch
@@ -24,7 +25,10 @@ internal static class WindowBackdropManager
 
     internal static bool SetBackdrop(Window window, WindowBackdropType backdropType)
     {
-        if (window is null || !IsSupported(backdropType) || window.AllowsTransparency)
+        if (window is null || 
+                !IsSupported(backdropType) || 
+                window.AllowsTransparency ||
+                IsBackdropEnabled == false)
         {
             return false;
         }
@@ -112,6 +116,23 @@ internal static class WindowBackdropManager
 
         var dwmApiResult = NativeMethods.DwmExtendFrameIntoClientArea(hWnd, ref margins);
         return new HRESULT((uint)dwmApiResult) == HRESULT.S_OK;
+    }
+
+    #endregion
+
+    #region Internal Properties
+
+    internal static bool IsBackdropEnabled
+    {
+        get
+        {
+            if (FrameworkAppContextSwitches.DisableFluentWindowsThemeWindowBackdrop || !Utility.IsOSWindows11Insider1OrNewer || !ThemeManager.IsFluentWindowsThemeEnabled)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 
     #endregion

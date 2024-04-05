@@ -1907,6 +1907,10 @@ namespace System.Windows
         protected virtual void OnSourceInitialized(EventArgs e)
         {
             VerifyContextAndObjectState();
+
+            // Setting WindowBackdrop 
+            WindowBackdropManager.SetBackdrop(this, WindowBackdropType);
+
             EventHandler handler = (EventHandler)Events[EVENT_SOURCEINITIALIZED];
             if (handler != null) handler(this, e);
         }
@@ -3031,6 +3035,39 @@ namespace System.Windows
         //----------------------------------------------
         #region Internal Properties
 
+        /// <summary>
+        /// Gets or sets a value determining preferred backdrop type for current <see cref="Window"/>.
+        /// </summary>
+        internal WindowBackdropType WindowBackdropType
+        {
+            get => (WindowBackdropType)GetValue(WindowBackdropTypeProperty);
+            set => SetValue(WindowBackdropTypeProperty, value);
+        }
+
+        /// <summary>
+        /// Property for <see cref="WindowBackdropType"/>.
+        /// </summary>
+        internal static readonly DependencyProperty WindowBackdropTypeProperty = DependencyProperty.Register(
+            nameof(WindowBackdropType),
+            typeof(WindowBackdropType),
+            typeof(Window),
+            new PropertyMetadata(WindowBackdropType.None, OnBackdropTypeChanged)
+        );
+
+        private static void OnBackdropTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is not Window window)
+            {
+                return;
+            }
+
+            if (e.OldValue == e.NewValue)
+            {
+                return;
+            }
+
+            WindowBackdropManager.SetBackdrop(window, (WindowBackdropType)e.NewValue);
+        }
 
         internal bool HwndCreatedButNotShown
         {
@@ -3555,7 +3592,14 @@ namespace System.Windows
             // TODO : Remove when FluentWindows theme is enabled by default
             if (ThemeManager.IsFluentWindowsThemeEnabled)
             {
-                SetResourceReference(StyleProperty, typeof(Window));
+                if(WindowBackdropManager.IsBackdropEnabled)
+                {
+                    SetResourceReference(StyleProperty, typeof(Window));
+                }
+                else
+                {
+                    SetResourceReference(StyleProperty, "BackdropDisabledWindowStyle");
+                }
             }
         }
 
