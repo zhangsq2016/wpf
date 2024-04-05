@@ -3051,8 +3051,10 @@ namespace System.Windows
             nameof(WindowBackdropType),
             typeof(WindowBackdropType),
             typeof(Window),
-            new PropertyMetadata(WindowBackdropType.None, OnBackdropTypeChanged)
-        );
+            new PropertyMetadata(
+                WindowBackdropType.MainWindow, 
+                new PropertyChangedCallback(OnBackdropTypeChanged),
+                new CoerceValueCallback(CoerceBackdropType)));
 
         private static void OnBackdropTypeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -3067,6 +3069,16 @@ namespace System.Windows
             }
 
             WindowBackdropManager.SetBackdrop(window, (WindowBackdropType)e.NewValue);
+        }
+
+        private static object CoerceBackdropType(DependencyObject d, object baseValue)
+        {
+            if(SystemParameters.HighContrast)
+            {
+                return WindowBackdropType.None;
+            }
+
+            return baseValue;
         }
 
         internal bool HwndCreatedButNotShown

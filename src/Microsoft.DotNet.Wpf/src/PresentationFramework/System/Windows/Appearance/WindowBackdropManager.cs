@@ -126,14 +126,21 @@ internal static class WindowBackdropManager
     {
         get
         {
-            if (FrameworkAppContextSwitches.DisableFluentWindowsThemeWindowBackdrop || !Utility.IsOSWindows11Insider1OrNewer || !ThemeManager.IsFluentWindowsThemeEnabled)
+            if (_isBackdropEnabled == null)
             {
-                return false;
+                _isBackdropEnabled = true;
+                
+                if (FrameworkAppContextSwitches.DisableFluentWindowsThemeWindowBackdrop || !Utility.IsOSWindows11Insider1OrNewer || !ThemeManager.IsFluentWindowsThemeEnabled)
+                {
+                    _isBackdropEnabled = false;
+                }
             }
 
-            return true;
+            return (bool)_isBackdropEnabled;
         }
     }
+
+    private static bool? _isBackdropEnabled = null;
 
     #endregion
 

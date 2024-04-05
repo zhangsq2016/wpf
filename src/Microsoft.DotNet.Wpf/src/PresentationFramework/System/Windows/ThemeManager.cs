@@ -74,15 +74,14 @@ internal static class ThemeManager
 
         if(needsUpdate || requestedTheme != _currentApplicationTheme || requestedUseLightMode != _currentUseLightMode)
         {
-            Uri dictionaryUri = GetFluentWindowThemeResourceUri(requestedTheme, requestedUseLightMode, out ApplicationTheme applicationTheme);
-            var backdropType = applicationTheme == ApplicationTheme.HighContrast ? WindowBackdropType.None : WindowBackdropType.MainWindow;
+            Uri dictionaryUri = GetFluentWindowThemeResourceUri(requestedTheme, requestedUseLightMode);
 
             UpdateFluentWindowsThemeResources(dictionaryUri);
 
             foreach(Window window in windows)
             {
                 SetImmersiveDarkMode(window, !requestedUseLightMode);
-                window.WindowBackdropType = backdropType;
+                window.CoerceValue(Window.WindowBackdropTypeProperty);
             }
 
             _currentApplicationTheme = requestedTheme;
@@ -125,13 +124,10 @@ internal static class ThemeManager
 
         if (appsUseLightTheme == null)
         {
-
-            // Slight deviation from Harshit's code
             return Registry.GetValue(_regPersonalizeKeyPath,
                 "SystemUsesLightTheme", null) as int? == 0 ? false : true;
         }
 
-        // Slight deviation from Harshit's code
         return appsUseLightTheme != 0;
     }
 
@@ -172,28 +168,18 @@ internal static class ThemeManager
 
     #region Internal Properties
 
-    internal static bool IsFluentWindowsThemeEnabled
-    {
-        get
-        {
-            return _isFluentWindowsThemeEnabled;
-        }
-    }
+    internal static bool IsFluentWindowsThemeEnabled => _isFluentWindowsThemeEnabled;
 
     #endregion
 
     #region Private Methods
 
-    private static Uri GetFluentWindowThemeResourceUri(
-        string systemTheme, bool useLightMode,
-        out ApplicationTheme applicationTheme
-    )
+    private static Uri GetFluentWindowThemeResourceUri(string systemTheme, bool useLightMode)
     {
-        string themeColorFileName = "light.xaml";
+        string themeColorFileName = useLightMode ? "light.xaml" : "dark.xaml";
 
         if(SystemParameters.HighContrast)
         {
-            applicationTheme = ApplicationTheme.HighContrast;
             themeColorFileName = systemTheme switch
             {
                 string s when s.Contains("hcblack") => "hcblack.xaml",
@@ -201,12 +187,6 @@ internal static class ThemeManager
                 string s when s.Contains("hc1") => "hc1.xaml",
                 _ => "hc2.xaml"
             };
-
-        }
-        else 
-        {
-            applicationTheme = useLightMode ? ApplicationTheme.Light : ApplicationTheme.Dark;
-            themeColorFileName = useLightMode ? "light.xaml" : "dark.xaml";
         }
 
         return new Uri("pack://application:,,,/PresentationFramework.FluentWindows;component/Resources/Theme/" + themeColorFileName, UriKind.Absolute);
