@@ -29,7 +29,11 @@ internal static class ThemeManager
             }
         }
 
-        _currentApplicationTheme = GetSystemTheme();
+        if(_isFluentWindowsThemeEnabled)
+        {
+            _currentApplicationTheme = GetSystemTheme();
+            DwmColorization.UpdateAccentColors();
+        }
     }
 
     #endregion
@@ -66,7 +70,7 @@ internal static class ThemeManager
     {
         bool needsUpdate = forceUpdate;
         
-        if(DwmColorization.GetSystemAccentColor() != DwmColorization.CurrentApplicationAccentColor)
+        if(requestedUseLightMode != _currentUseLightMode || DwmColorization.GetSystemAccentColor() != DwmColorization.CurrentApplicationAccentColor)
         {
             DwmColorization.UpdateAccentColors();
             needsUpdate = true;
