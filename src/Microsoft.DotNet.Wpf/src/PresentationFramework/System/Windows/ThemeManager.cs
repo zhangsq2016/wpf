@@ -38,7 +38,7 @@ internal static class ThemeManager
         if(IsFluentWindowsThemeEnabled && !_isFluentWindowsThemeInitialized)
         {
             _currentApplicationTheme = GetSystemTheme();
-            _currentUseLightMode = GetUseLightTheme();
+            _currentUseLightMode = IsSystemThemeLight();
 
             var themeColorResourceUri = GetFluentWindowThemeColorResourceUri(_currentApplicationTheme, _currentUseLightMode);
             Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = themeColorResourceUri });
@@ -77,7 +77,7 @@ internal static class ThemeManager
         }
 
         string systemTheme = GetSystemTheme();
-        bool useLightMode = GetUseLightTheme();
+        bool useLightMode = IsSystemThemeLight();
         Color systemAccentColor = DwmColorization.GetSystemAccentColor();
         ApplyTheme(windows , systemTheme, useLightMode, systemAccentColor, forceUpdate);
     }
@@ -98,19 +98,14 @@ internal static class ThemeManager
         Color requestedAccentColor, 
         bool forceUpdate = false)
     {
-        bool needsUpdate = forceUpdate;
-
-        if(needsUpdate || requestedUseLightMode != _currentUseLightMode || 
+        if(forceUpdate || 
+                requestedTheme != _currentApplicationTheme || 
+                requestedUseLightMode != _currentUseLightMode ||
                 DwmColorization.GetSystemAccentColor() != DwmColorization.CurrentApplicationAccentColor)
         {
             DwmColorization.UpdateAccentColors();
-            needsUpdate = true;
-        }
 
-        if(needsUpdate || requestedTheme != _currentApplicationTheme || requestedUseLightMode != _currentUseLightMode)
-        {
             Uri dictionaryUri = GetFluentWindowThemeColorResourceUri(requestedTheme, requestedUseLightMode);
-
             AddOrUpdateThemeResources(dictionaryUri);
 
             foreach(Window window in windows)
@@ -121,7 +116,7 @@ internal static class ThemeManager
                 }
                 
                 SetImmersiveDarkMode(window, !requestedUseLightMode);
-                window.CoerceValue(Window.WindowBackdropTypeProperty);
+                WindowBackdropManager.SetBackdrop(window, SystemParameters.HighContrast ? WindowBackdropType.None : WindowBackdropType.MainWindow);
             }
 
             _currentApplicationTheme = requestedTheme;
@@ -173,18 +168,18 @@ internal static class ThemeManager
     ///   If the key is not present, it reads the SystemUsesLightTheme key.
     /// </summary>
     /// <returns></returns>
-    internal static bool GetUseLightTheme()
+    internal static bool IsSystemThemeLight()
     {
-        var appsUseLightTheme = Registry.GetValue(_regPersonalizeKeyPath,
+        var useLightTheme = Registry.GetValue(_regPersonalizeKeyPath,
             "AppsUseLightTheme", null) as int?;
 
-        if (appsUseLightTheme == null)
+        if (useLightTheme == null)
         {
-            return Registry.GetValue(_regPersonalizeKeyPath,
-                "SystemUsesLightTheme", null) as int? == 0 ? false : true;
+            useLightTheme = Registry.GetValue(_regPersonalizeKeyPath,
+                "SystemUsesLightTheme", null) as int?;
         }
 
-        return appsUseLightTheme != 0;
+        return useLightTheme != null && useLightTheme != 0;
     }
 
     /// <summary>
@@ -197,15 +192,16 @@ internal static class ThemeManager
 
         var newDictionary = new ResourceDictionary() { Source = dictionaryUri };
 
+        ResourceDictionary currentDictionary = Application.Current?.Resources;
         foreach (var key in newDictionary.Keys)
         {
-            if (Application.Current.Resources.Contains(key))
+            if (currentDictionary.Contains(key))
             {
-                Application.Current.Resources[key] = newDictionary[key];
+                currentDictionary[key] = newDictionary[key];
             }
             else
             {
-                Application.Current.Resources.Add(key, newDictionary[key]);
+                currentDictionary.Add(key, newDictionary[key]);
             }
         }
     }

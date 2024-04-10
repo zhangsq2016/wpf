@@ -419,7 +419,6 @@
     <Compile Include="System\Windows\Annotations\Storage\AnnotationStore.cs" />
     <Compile Include="System\Windows\Annotations\Storage\StoreContentChangedEventArgs.cs" />
     <Compile Include="System\Windows\Annotations\Storage\XmlStreamStore.cs" />
-    <Compile Include="System\Windows\Appearance\ApplicationTheme.cs" />
     <Compile Include="System\Windows\Appearance\WindowBackdropManager.cs" />
     <Compile Include="System\Windows\Application.cs" />
     <Compile Include="System\Windows\AttachedPropertyBrowsableForChildrenAttribute.cs" />

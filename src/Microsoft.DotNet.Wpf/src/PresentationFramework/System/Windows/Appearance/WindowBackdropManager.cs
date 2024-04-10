@@ -94,6 +94,7 @@ internal static class WindowBackdropManager
             var windowSource = HwndSource.FromHwnd(hwnd);
             if (windowSource.CompositionTarget != null)
             {
+                // TODO : Save the previous background color and reapply in RestoreBackground 
                 windowSource.CompositionTarget.BackgroundColor = Colors.Transparent;
                 return true;
             }
