@@ -25,8 +25,8 @@ internal static class WindowBackdropManager
 
     internal static bool SetBackdrop(Window window, WindowBackdropType backdropType)
     {
-        if (window is null || 
-                !IsSupported(backdropType) || 
+        if (window is null ||
+                !IsSupported(backdropType) ||
                 window.AllowsTransparency ||
                 IsBackdropEnabled == false)
         {
@@ -34,7 +34,7 @@ internal static class WindowBackdropManager
         }
 
         var handle = new WindowInteropHelper(window).Handle;
-        if(handle == IntPtr.Zero)
+        if (handle == IntPtr.Zero)
         {
             return false;
         }
@@ -46,7 +46,10 @@ internal static class WindowBackdropManager
 
     private static bool SetBackdropCore(IntPtr hwnd, WindowBackdropType backdropType)
     {
-        ArgumentNullException.ThrowIfNull(hwnd, nameof(hwnd));
+        if (hwnd == IntPtr.Zero)
+        {
+            return false;
+        }
 
         if (backdropType == WindowBackdropType.None)
         {
@@ -61,7 +64,7 @@ internal static class WindowBackdropManager
     private static bool ApplyBackdrop(IntPtr hwnd, WindowBackdropType backdropType)
     {
         UpdateGlassFrame(hwnd, backdropType);
-        
+
         var backdropPvAttribute = backdropType switch
         {
             WindowBackdropType.Auto => Standard.DWMSBT.DWMSBT_TABBEDWINDOW,
@@ -75,46 +78,52 @@ internal static class WindowBackdropManager
         return dwmResult == HRESULT.S_OK;
     }
 
-    private static bool RemoveBackdrop(IntPtr hWnd)
+    private static bool RemoveBackdrop(IntPtr hwnd)
     {
-        UpdateGlassFrame(hWnd, WindowBackdropType.None);
+        UpdateGlassFrame(hwnd, WindowBackdropType.None);
 
         var backdropPvAttribute = Standard.DWMSBT.DWMSBT_NONE;
-        var dwmResult = NativeMethods.DwmSetWindowAttributeSystemBackdropType(hWnd, backdropPvAttribute);
+        var dwmResult = NativeMethods.DwmSetWindowAttributeSystemBackdropType(hwnd, backdropPvAttribute);
         return dwmResult == HRESULT.S_OK;
     }
 
     private static bool RemoveBackground(IntPtr hwnd)
     {
-        var windowSource = HwndSource.FromHwnd(hwnd);
-        if(windowSource?.Handle != IntPtr.Zero && windowSource.CompositionTarget != null)
+        if (hwnd != IntPtr.Zero)
         {
-            windowSource.CompositionTarget.BackgroundColor = Colors.Transparent;
-            return true;
+            var windowSource = HwndSource.FromHwnd(hwnd);
+            if (windowSource.CompositionTarget != null)
+            {
+                windowSource.CompositionTarget.BackgroundColor = Colors.Transparent;
+                return true;
+            }
         }
         return false;
     }
 
     private static bool RestoreBackground(IntPtr hwnd)
     {
-        var windowSource = HwndSource.FromHwnd(hwnd);
-        if(windowSource?.Handle != IntPtr.Zero && windowSource.CompositionTarget != null)
+        if (hwnd != IntPtr.Zero)
         {
-            windowSource.CompositionTarget.BackgroundColor = SystemColors.WindowColor;
-            return true;
+            var windowSource = HwndSource.FromHwnd(hwnd);
+            if (windowSource?.Handle != IntPtr.Zero && windowSource.CompositionTarget != null)
+            {
+                windowSource.CompositionTarget.BackgroundColor = SystemColors.WindowColor;
+                return true;
+            }
         }
         return false;
     }
 
-    private static bool UpdateGlassFrame(IntPtr hWnd, WindowBackdropType backdropType)
+    private static bool UpdateGlassFrame(IntPtr hwnd, WindowBackdropType backdropType)
     {
         MARGINS margins = new MARGINS();
-        if(backdropType != WindowBackdropType.None)
+        if (backdropType != WindowBackdropType.None)
         {
-            margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };                    
+            margins = new MARGINS { cxLeftWidth = -1, cxRightWidth = -1, cyTopHeight = -1, cyBottomHeight = -1 };
         }
 
-        var dwmApiResult = NativeMethods.DwmExtendFrameIntoClientArea(hWnd, ref margins);
+        var dwmApiResult = NativeMethods.DwmExtendFrameIntoClientArea(hwnd, ref margins);
         return new HRESULT((uint)dwmApiResult) == HRESULT.S_OK;
     }
 
@@ -122,23 +131,27 @@ internal static class WindowBackdropManager
 
     #region Internal Properties
 
-    internal static bool IsBackdropEnabled
-    {
-        get
-        {
-            if (_isBackdropEnabled == null)
-            {
-                _isBackdropEnabled = true;
-                
-                if (FrameworkAppContextSwitches.DisableFluentWindowsThemeWindowBackdrop || !Utility.IsOSWindows11Insider1OrNewer || !ThemeManager.IsFluentWindowsThemeEnabled)
-                {
-                    _isBackdropEnabled = false;
-                }
-            }
+    // internal static bool IsBackdropEnabled
+    // {
+    //     get
+    //     {
+    //         if (_isBackdropEnabled == null)
+    //         {
+    //             _isBackdropEnabled = true;
 
-            return (bool)_isBackdropEnabled;
-        }
-    }
+    //             if (FrameworkAppContextSwitches.DisableFluentWindowsThemeWindowBackdrop || !Utility.IsOSWindows11Insider1OrNewer || !ThemeManager.IsFluentWindowsThemeEnabled)
+    //             {
+    //                 _isBackdropEnabled = false;
+    //             }
+    //         }
+
+    //         return (bool)_isBackdropEnabled;
+    //     }
+    // }
+
+    internal static bool IsBackdropEnabled => _isBackdropEnabled ??= Utility.IsOSWindows11Insider1OrNewer && 
+                                                                        ThemeManager.IsFluentWindowsThemeEnabled &&
+                                                                        !FrameworkAppContextSwitches.DisableFluentWindowsThemeWindowBackdrop;
 
     private static bool? _isBackdropEnabled = null;
 
