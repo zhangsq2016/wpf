@@ -2517,19 +2517,8 @@ namespace System.Windows
 
             if (Standard.Utility.IsOSWindows11OrNewer && ThemeManager.IsFluentWindowsThemeEnabled)
             {
-                var themeColorFileName = ThemeManager.GetUseLightTheme() ? "light.xaml" : "dark.xaml";
-                ResourceDictionary themeDictionary = new ResourceDictionary() 
-                    { Source = new Uri($"pack://application:,,,/PresentationFramework.FluentWindows;component/resources/theme/{themeColorFileName}", 
-                                            UriKind.Absolute) };
-
-                ThemeManager.AddFluentWindowsThemeDictionary(themeDictionary);
+                ThemeManager.InitializeFluentWindowsTheme();
                 ThemeManager.ApplySystemTheme(this, true);
-
-                // Initializing the application window with current system theme
-                // This is one time initialization that updates the resourcedictionary and 
-                // calls WindowBackgroundManager to update its Background based on current SystemTheme
-                // DwmColorization.UpdateAccentColors();
-                // ThemeColorization.ApplyTheme(this);
             }
 
             // Sub classes can have different intialization. RBW does very minimalistic

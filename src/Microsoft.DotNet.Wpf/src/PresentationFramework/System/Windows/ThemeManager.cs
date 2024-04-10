@@ -15,8 +15,7 @@ internal static class ThemeManager
 
     static ThemeManager()
     {
-        _cachedThemeDictionaryUris = new List<Uri>();
-
+        // TODO : Temprorary way of checking if setting FluentWindows theme enabled flag. Provide a property for theme switch.
         if (Application.Current != null)
         {
             foreach (ResourceDictionary mergedDictionary in Application.Current.Resources.MergedDictionaries)
@@ -28,40 +27,71 @@ internal static class ThemeManager
                 }
             }
         }
-
-        if(_isFluentWindowsThemeEnabled)
-        {
-            _currentApplicationTheme = GetSystemTheme();
-            DwmColorization.UpdateAccentColors();
-        }
     }
 
     #endregion
 
     #region Internal Methods
 
-    internal static void ApplySystemTheme(bool forceUpdate = false)
+    internal static void InitializeFluentWindowsTheme()
     {
-        string systemTheme = GetSystemTheme();
-        bool useLightMode = GetUseLightTheme();
-        Color systemAccentColor = DwmColorization.GetSystemAccentColor();
-
-        var windows = Application.Current?.Windows;
-        if(windows != null)
+        if(IsFluentWindowsThemeEnabled && !_isFluentWindowsThemeInitialized)
         {
-            ApplyTheme(windows , systemTheme, useLightMode, systemAccentColor, forceUpdate);
+            _currentApplicationTheme = GetSystemTheme();
+            _currentUseLightMode = GetUseLightTheme();
+
+            var themeColorResourceUri = GetFluentWindowThemeColorResourceUri(_currentApplicationTheme, _currentUseLightMode);
+            Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = themeColorResourceUri });
+
+            DwmColorization.UpdateAccentColors();
+            _isFluentWindowsThemeInitialized = true;
         }
     }
 
+    /// <summary>
+    ///    Apply the system theme one window.
+    /// </summary>
+    /// <param name="forceUpdate"></param>
     internal static void ApplySystemTheme(Window window, bool forceUpdate = false)
     {
+        ApplySystemTheme(new List<Window> { window }, forceUpdate);
+    }
+
+    /// <summary>
+    ///   Apply the system theme to a list of windows.
+    ///   If windows is not provided, apply the theme to all windows in the application.
+    /// </summary>
+    /// <param name="window"></param>
+    /// <param name="forceUpdate"></param>
+    internal static void ApplySystemTheme(IEnumerable windows = null, bool forceUpdate = false)
+    {
+        if(windows == null)
+        {
+            // If windows is not provided, apply the theme to all windows in the application.
+            windows = Application.Current?.Windows;
+            
+            if(windows == null)
+            {
+                return;
+            }
+        }
+
         string systemTheme = GetSystemTheme();
         bool useLightMode = GetUseLightTheme();
         Color systemAccentColor = DwmColorization.GetSystemAccentColor();
-        ApplyTheme(new ArrayList { window } , systemTheme, useLightMode, systemAccentColor, forceUpdate);
+        ApplyTheme(windows , systemTheme, useLightMode, systemAccentColor, forceUpdate);
     }
 
-    internal static void ApplyTheme(
+    /// <summary>
+    ///  Apply the requested theme and color mode to the windows.
+    ///  Checks if any update is needed before applying the changes.
+    /// </summary>
+    /// <param name="windows"></param>
+    /// <param name="requestedTheme"></param>
+    /// <param name="requestedUseLightMode"></param>
+    /// <param name="requestedAccentColor"></param>
+    /// <param name="forceUpdate"></param>
+    private static void ApplyTheme(
         IEnumerable windows, 
         string requestedTheme, 
         bool requestedUseLightMode,
@@ -69,8 +99,9 @@ internal static class ThemeManager
         bool forceUpdate = false)
     {
         bool needsUpdate = forceUpdate;
-        
-        if(requestedUseLightMode != _currentUseLightMode || DwmColorization.GetSystemAccentColor() != DwmColorization.CurrentApplicationAccentColor)
+
+        if(needsUpdate || requestedUseLightMode != _currentUseLightMode || 
+                DwmColorization.GetSystemAccentColor() != DwmColorization.CurrentApplicationAccentColor)
         {
             DwmColorization.UpdateAccentColors();
             needsUpdate = true;
@@ -78,12 +109,17 @@ internal static class ThemeManager
 
         if(needsUpdate || requestedTheme != _currentApplicationTheme || requestedUseLightMode != _currentUseLightMode)
         {
-            Uri dictionaryUri = GetFluentWindowThemeResourceUri(requestedTheme, requestedUseLightMode);
+            Uri dictionaryUri = GetFluentWindowThemeColorResourceUri(requestedTheme, requestedUseLightMode);
 
-            UpdateFluentWindowsThemeResources(dictionaryUri);
+            AddOrUpdateThemeResources(dictionaryUri);
 
             foreach(Window window in windows)
             {
+                if(window == null)
+                {
+                    continue;
+                }
+                
                 SetImmersiveDarkMode(window, !requestedUseLightMode);
                 window.CoerceValue(Window.WindowBackdropTypeProperty);
             }
@@ -93,6 +129,12 @@ internal static class ThemeManager
         }
     }
 
+    /// <summary>
+    ///  Set the immersive dark mode windowattribute for the window.
+    /// </summary>
+    /// <param name="window"></param>
+    /// <param name="useDarkMode"></param>
+    /// <returns></returns>
     private static bool SetImmersiveDarkMode(Window window, bool useDarkMode)
     {
         if (window == null)
@@ -113,14 +155,24 @@ internal static class ThemeManager
 
     #region Helper Methods
 
+    /// <summary>
+    ///   Reads the CurrentTheme registry key to fetch the system theme.
+    ///   This along with UseLightTheme is used to determine the theme and color mode.
+    /// </summary>
+    /// <returns></returns>
     internal static string GetSystemTheme()
     {
         string systemTheme = Registry.GetValue(_regThemeKeyPath,
-            "CurrentTheme", "aero.theme") as string ?? String.Empty;
+            "CurrentTheme", null) as string ?? "aero.theme";
 
         return systemTheme;
     }
    
+    /// <summary>
+    ///   Reads the AppsUseLightTheme registry key to fetch the color mode.
+    ///   If the key is not present, it reads the SystemUsesLightTheme key.
+    /// </summary>
+    /// <returns></returns>
     internal static bool GetUseLightTheme()
     {
         var appsUseLightTheme = Registry.GetValue(_regPersonalizeKeyPath,
@@ -135,7 +187,11 @@ internal static class ThemeManager
         return appsUseLightTheme != 0;
     }
 
-    internal static void UpdateFluentWindowsThemeResources(Uri dictionaryUri)
+    /// <summary>
+    ///  Update the FluentWindows theme resources with the values in new dictionary.
+    /// </summary>
+    /// <param name="dictionaryUri"></param>
+    private static void AddOrUpdateThemeResources(Uri dictionaryUri)
     {
         ArgumentNullException.ThrowIfNull(dictionaryUri, nameof(dictionaryUri));
 
@@ -145,24 +201,12 @@ internal static class ThemeManager
         {
             if (Application.Current.Resources.Contains(key))
             {
-                if (!object.Equals(Application.Current.Resources[key], newDictionary[key]))
-                {
-                    Application.Current.Resources[key] = newDictionary[key];
-                }
+                Application.Current.Resources[key] = newDictionary[key];
             }
             else
             {
                 Application.Current.Resources.Add(key, newDictionary[key]);
             }
-        }
-    }
-
-    internal static void AddFluentWindowsThemeDictionary(ResourceDictionary dictionary)
-    {
-        if(IsFluentWindowsThemeEnabled && !_cachedThemeDictionaryUris.Contains(dictionary.Source))
-        {
-            Application.Current.Resources.MergedDictionaries.Add(dictionary);
-            _cachedThemeDictionaryUris.Add(dictionary.Source);
         }
     }
 
@@ -178,7 +222,7 @@ internal static class ThemeManager
 
     #region Private Methods
 
-    private static Uri GetFluentWindowThemeResourceUri(string systemTheme, bool useLightMode)
+    private static Uri GetFluentWindowThemeColorResourceUri(string systemTheme, bool useLightMode)
     {
         string themeColorFileName = useLightMode ? "light.xaml" : "dark.xaml";
 
@@ -210,7 +254,7 @@ internal static class ThemeManager
 
     private static bool _isFluentWindowsThemeEnabled = false;
 
-    private static ICollection<Uri> _cachedThemeDictionaryUris;
+    private static bool _isFluentWindowsThemeInitialized = false;
 
     #endregion
 }
