@@ -41,7 +41,7 @@ internal static class DwmColorization
     /// <returns>Updated <see cref="System.Windows.Media.Color"/> Accent Color.</returns>
     internal static Color GetSystemAccentColor()
     {
-        _UISettings.GetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent);
+        _UISettings.TryGetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent);
         return systemAccent;
     }
 
@@ -60,12 +60,14 @@ internal static class DwmColorization
 
         if (ThemeManager.IsSystemThemeLight())
         {
+            // In light mode, we use darker shades of the accent color
             primaryAccent = _UISettings.AccentDark1;
             secondaryAccent = _UISettings.AccentDark2;
             tertiaryAccent = _UISettings.AccentDark3;
         }
         else
         {
+            // In dark mode, we use lighter shades of the accent color
             primaryAccent = _UISettings.AccentLight1;
             secondaryAccent = _UISettings.AccentLight2;
             tertiaryAccent = _UISettings.AccentLight3;

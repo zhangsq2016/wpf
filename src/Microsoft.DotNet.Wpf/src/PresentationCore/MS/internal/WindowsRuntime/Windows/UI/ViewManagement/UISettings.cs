@@ -27,7 +27,7 @@ namespace MS.Internal.WindowsRuntime
 
             internal UISettings()
             {
-                _isSupported = true;
+                _isSupported = false;
 
                 try
                 {
@@ -35,15 +35,25 @@ namespace MS.Internal.WindowsRuntime
                 }
                 catch (COMException)
                 {
+                    // We don't want to throw any exceptions here.
+                    // If we can't get the instance, we will use the default accent color.
                 }
 
-                if (_uisettings == null)
+                if (_uisettings != null)
                 {
-                    _isSupported = false;
+                    _isSupported = true;
+                    TryUpdateAccentColors();
                 }
             }
 
-            internal bool GetColorValue(UISettingsRCW.UIColorType desiredColor, out Color color)
+            /// <summary>
+            ///     Gets the accent color value for the desired color type.
+            /// </summary>
+            /// <returns>
+            ///     Returns true if fetching value from UISettings was successful.
+            ///     If the fetch fails, we return false and return the default accent color.
+            /// </returns>
+            internal bool TryGetColorValue(UISettingsRCW.UIColorType desiredColor, out Color color)
             {                
                 if(_isSupported)
                 {
@@ -55,12 +65,20 @@ namespace MS.Internal.WindowsRuntime
                     }
                     catch (COMException)
                     {
+                        // We don't want to throw any exceptions here.
+                        // If we can't get the instance, we will use the default accent color.
                     }
                 }
                 color = _fallbackAccentColor;
                 return false;
             }
 
+            /// <summary>
+            ///   Tries to update the accent colors properties.
+            ///   If any call to TryGetColorValue fails, we set _useFallbackColor to true.
+            ///   After which all the accent values will be the default color.
+            ///   This is to ensure that we don't have inconsistent set of accent color values stored.
+            /// </summary>
             internal void TryUpdateAccentColors()
             {
                 _useFallbackColor = true;
@@ -69,28 +87,35 @@ namespace MS.Internal.WindowsRuntime
                 {
                     try
                     {
-                        if(GetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent))
+                        if(TryGetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent))
                         {
+                            // For verifying if any of the calls to TryGetColorValue fails.
                             bool result = true;
                             if(_accentColor != systemAccent)
                             {
-                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight1, out _accentLight1);
-                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight2, out _accentLight2);
-                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight3, out _accentLight3);
-                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark1, out _accentDark1);
-                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark2, out _accentDark2);
-                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark3, out _accentDark3);
+                                result &= TryGetColorValue(UISettingsRCW.UIColorType.AccentLight1, out _accentLight1);
+                                result &= TryGetColorValue(UISettingsRCW.UIColorType.AccentLight2, out _accentLight2);
+                                result &= TryGetColorValue(UISettingsRCW.UIColorType.AccentLight3, out _accentLight3);
+                                result &= TryGetColorValue(UISettingsRCW.UIColorType.AccentDark1, out _accentDark1);
+                                result &= TryGetColorValue(UISettingsRCW.UIColorType.AccentDark2, out _accentDark2);
+                                result &= TryGetColorValue(UISettingsRCW.UIColorType.AccentDark3, out _accentDark3);
                                 _accentColor = systemAccent;
                             }
+                            // If result is false, hence atleast one call, use fallback values.
                             _useFallbackColor = !result;
                         }
                     }
                     catch
                     {
+                        // We don't want to throw any exceptions here.
+                        // If we can't get any one of the color values, we will use the default accent color.
                     }
                 }
             }
 
+            /// <summary>
+            ///   Gets the WinRT instance of UISettings.
+            /// </summary>
             private static object GetWinRTInstance()
             {
                 object _winRtInstance = null;
