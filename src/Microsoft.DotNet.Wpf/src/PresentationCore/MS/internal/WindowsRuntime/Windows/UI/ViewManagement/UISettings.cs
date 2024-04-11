@@ -18,7 +18,7 @@ namespace MS.Internal.WindowsRuntime
 
             private UISettingsRCW.IUISettings3 _uisettings;
 
-            private static Color _fallbackAccentColor = Color.FromArgb(0xff, 0x00, 0x78, 0xd4);
+            private static readonly Color _fallbackAccentColor = Color.FromArgb(0xff, 0x00, 0x78, 0xd4);
 
             private Color _accentColor, _accentLight1, _accentLight2, _accentLight3;
             private Color _accentDark1, _accentDark2, _accentDark3;
@@ -118,17 +118,17 @@ namespace MS.Internal.WindowsRuntime
             /// </summary>
             private static object GetWinRTInstance()
             {
-                object _winRtInstance = null;
+                object winRtInstance = null;
                 try
                 {
-                    _winRtInstance = UISettingsRCW.GetUISettingsInstance();
+                    winRtInstance = UISettingsRCW.GetUISettingsInstance();
                 }
                 catch (Exception e) when (e is TypeLoadException || e is FileNotFoundException)
                 {
-                    _winRtInstance = null;
+                    winRtInstance = null;
                 }
 
-                return _winRtInstance;
+                return winRtInstance;
             }
 
             #region Color Properties
@@ -166,7 +166,7 @@ namespace MS.Internal.WindowsRuntime
                     {
                         try
                         {
-                            // Release the input pane here
+                            // Release the _uiSettings instance here
                             Marshal.ReleaseComObject(_uisettings);
                         }
                         catch
