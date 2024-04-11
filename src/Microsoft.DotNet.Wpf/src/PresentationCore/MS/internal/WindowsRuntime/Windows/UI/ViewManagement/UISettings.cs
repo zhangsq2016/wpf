@@ -14,7 +14,7 @@ namespace MS.Internal.WindowsRuntime
     {
         internal class UISettings : IDisposable
         {
-            private static readonly bool _isSupported;
+            private readonly bool _isSupported;
 
             private UISettingsRCW.IUISettings3 _uisettings;
 
@@ -25,29 +25,9 @@ namespace MS.Internal.WindowsRuntime
 
             private bool _useFallbackColor = false;
 
-            static UISettings()
-            {
-                try
-                {
-                    _isSupported = true;
-                    
-                    if (GetWinRTInstance() == null)
-                    {
-                        _isSupported = false;
-                    }
-                }
-                catch
-                {
-                    _isSupported = false;
-                }
-            }
-
             internal UISettings()
             {
-                if (!_isSupported)
-                {
-                    throw new PlatformNotSupportedException();
-                }
+                _isSupported = true;
 
                 try
                 {
@@ -59,51 +39,55 @@ namespace MS.Internal.WindowsRuntime
 
                 if (_uisettings == null)
                 {
-                    throw new PlatformNotSupportedException();
+                    _isSupported = false;
                 }
             }
 
             internal bool GetColorValue(UISettingsRCW.UIColorType desiredColor, out Color color)
-            {
-                bool result = false;
-
-                try
+            {                
+                if(_isSupported)
                 {
-                    var uiColor = _uisettings.GetColorValue(desiredColor);
-                    color = Color.FromArgb(uiColor.A, uiColor.R, uiColor.G, uiColor.B);
-                    result = true;
+                    try
+                    {
+                        var uiColor = _uisettings.GetColorValue(desiredColor);
+                        color = Color.FromArgb(uiColor.A, uiColor.R, uiColor.G, uiColor.B);
+                        return true;
+                    }
+                    catch (COMException)
+                    {
+                    }
                 }
-                catch (COMException)
-                {
-                    color = _fallbackAccentColor;
-                }
-
-                return result;
+                color = _fallbackAccentColor;
+                return false;
             }
 
             internal void TryUpdateAccentColors()
             {
                 _useFallbackColor = true;
-                try
+
+                if(_isSupported)
                 {
-                    if(GetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent))
+                    try
                     {
-                        bool result = true;
-                        if(_accentColor != systemAccent)
+                        if(GetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent))
                         {
-                            result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight1, out _accentLight1);
-                            result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight2, out _accentLight2);
-                            result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight3, out _accentLight3);
-                            result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark1, out _accentDark1);
-                            result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark2, out _accentDark2);
-                            result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark3, out _accentDark3);
-                            _accentColor = systemAccent;
+                            bool result = true;
+                            if(_accentColor != systemAccent)
+                            {
+                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight1, out _accentLight1);
+                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight2, out _accentLight2);
+                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentLight3, out _accentLight3);
+                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark1, out _accentDark1);
+                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark2, out _accentDark2);
+                                result &= GetColorValue(UISettingsRCW.UIColorType.AccentDark3, out _accentDark3);
+                                _accentColor = systemAccent;
+                            }
+                            _useFallbackColor = !result;
                         }
-                        _useFallbackColor = !result;
                     }
-                }
-                catch
-                {
+                    catch
+                    {
+                    }
                 }
             }
 

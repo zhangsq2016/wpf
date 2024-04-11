@@ -10,11 +10,9 @@ using MS.Internal.WindowsRuntime.Windows.UI.ViewManagement;
 namespace System.Windows;
 internal static class DwmColorization
 {
-    private static Color _fallbackAccentColor = Color.FromArgb(0xff, 0x00, 0x78, 0xd4);
-    private static Color _currentApplicationAccentColor = _fallbackAccentColor;
+    private static Color _currentApplicationAccentColor = Color.FromArgb(0xff, 0x00, 0x78, 0xd4);
 
     private static UISettings _uiSettings = null;
-    private static bool _uiSettingsInitializationFailed = false;
 
     /// <summary>
     ///     Gets the current application accent color.
@@ -28,17 +26,9 @@ internal static class DwmColorization
     {
         get
         {
-            if (!_uiSettingsInitializationFailed && _uiSettings == null)
+            if (_uiSettings == null)
             {
-                try
-                {
-                    _uiSettings = new UISettings();
-                }
-                catch (PlatformNotSupportedException)
-                {
-                    _uiSettings = null;
-                    _uiSettingsInitializationFailed = true;
-                }
+                _uiSettings = new UISettings();
             }
 
             return _uiSettings;
@@ -51,18 +41,8 @@ internal static class DwmColorization
     /// <returns>Updated <see cref="System.Windows.Media.Color"/> Accent Color.</returns>
     internal static Color GetSystemAccentColor()
     {
-        if (!_uiSettingsInitializationFailed)
-        {
-            try
-            {
-                _UISettings.GetColorValue(UISettingsRCW.UIColorType.Accent, out Color color);
-                return color;
-            }
-            catch
-            {}
-        }
-
-        return _fallbackAccentColor;
+        _UISettings.GetColorValue(UISettingsRCW.UIColorType.Accent, out Color systemAccent);
+        return systemAccent;
     }
 
     /// <summary>
@@ -70,33 +50,25 @@ internal static class DwmColorization
     /// </summary>
     internal static void UpdateAccentColors()
     {
-        Color systemAccent, primaryAccent, secondaryAccent, tertiaryAccent;
+        Color systemAccent = GetSystemAccentColor();
+        Color primaryAccent, secondaryAccent, tertiaryAccent;
 
-        if(_uiSettingsInitializationFailed) 
+        if (systemAccent != _currentApplicationAccentColor)
         {
-            primaryAccent = secondaryAccent = tertiaryAccent = systemAccent = _fallbackAccentColor;
+            _UISettings.TryUpdateAccentColors();
+        }
+
+        if (ThemeManager.IsSystemThemeLight())
+        {
+            primaryAccent = _UISettings.AccentDark1;
+            secondaryAccent = _UISettings.AccentDark2;
+            tertiaryAccent = _UISettings.AccentDark3;
         }
         else
         {
-            systemAccent = GetSystemAccentColor();
-
-            if (systemAccent != _currentApplicationAccentColor)
-            {
-                _UISettings.TryUpdateAccentColors();
-            }
-
-            if (ThemeManager.IsSystemThemeLight())
-            {
-                primaryAccent = _UISettings.AccentDark1;
-                secondaryAccent = _UISettings.AccentDark2;
-                tertiaryAccent = _UISettings.AccentDark3;
-            }
-            else
-            {
-                primaryAccent = _UISettings.AccentLight1;
-                secondaryAccent = _UISettings.AccentLight2;
-                tertiaryAccent = _UISettings.AccentLight3;
-            }
+            primaryAccent = _UISettings.AccentLight1;
+            secondaryAccent = _UISettings.AccentLight2;
+            tertiaryAccent = _UISettings.AccentLight3;
         }
 
         UpdateColorResources(systemAccent, primaryAccent, secondaryAccent, tertiaryAccent);
