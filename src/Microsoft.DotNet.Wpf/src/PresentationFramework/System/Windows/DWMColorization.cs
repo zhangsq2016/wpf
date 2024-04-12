@@ -102,46 +102,46 @@ internal static class DwmColorization
             .WriteLine("INFO | SystemAccentColorTertiary: " + tertiaryAccent, "System.Windows.Accent");
 #endif
 
-        if (!ThemeManager.IsSystemThemeLight())
-        {
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine("INFO | Text on accent is DARK", "System.Windows.Accent");
-#endif
-            Application.Current.Resources["TextOnAccentFillColorPrimary"] = 
-                    Color.FromArgb( 0xFF, 0x00, 0x00, 0x00);
+//         if (!ThemeManager.IsSystemThemeLight())
+//         {
+// #if DEBUG
+//             System.Diagnostics.Debug.WriteLine("INFO | Text on accent is DARK", "System.Windows.Accent");
+// #endif
+//             Application.Current.Resources["TextOnAccentFillColorPrimary"] = 
+//                     Color.FromArgb( 0xFF, 0x00, 0x00, 0x00);
             
-            Application.Current.Resources["TextOnAccentFillColorSecondary"] = 
-                    Color.FromArgb( 0x80, 0x00, 0x00, 0x00);
+//             Application.Current.Resources["TextOnAccentFillColorSecondary"] = 
+//                     Color.FromArgb( 0x80, 0x00, 0x00, 0x00);
             
-            Application.Current.Resources["TextOnAccentFillColorDisabled"] = 
-                    Color.FromArgb( 0x77, 0x00, 0x00, 0x00);
+//             Application.Current.Resources["TextOnAccentFillColorDisabled"] = 
+//                     Color.FromArgb( 0x77, 0x00, 0x00, 0x00);
             
-            Application.Current.Resources["TextOnAccentFillColorSelectedText"] = 
-                    Color.FromArgb( 0x00, 0x00, 0x00, 0x00);
+//             Application.Current.Resources["TextOnAccentFillColorSelectedText"] = 
+//                     Color.FromArgb( 0x00, 0x00, 0x00, 0x00);
             
-            Application.Current.Resources["AccentTextFillColorDisabled"] = 
-                    Color.FromArgb( 0x5D, 0x00, 0x00, 0x00);
-        }
-        else
-        {
-#if DEBUG
-            System.Diagnostics.Debug.WriteLine("INFO | Text on accent is LIGHT", "System.Windows.Accent");
-#endif
-            Application.Current.Resources["TextOnAccentFillColorPrimary"] = 
-                    Color.FromArgb( 0xFF, 0xFF, 0xFF, 0xFF);
+//             Application.Current.Resources["AccentTextFillColorDisabled"] = 
+//                     Color.FromArgb( 0x5D, 0x00, 0x00, 0x00);
+//         }
+//         else
+//         {
+// #if DEBUG
+//             System.Diagnostics.Debug.WriteLine("INFO | Text on accent is LIGHT", "System.Windows.Accent");
+// #endif
+//             Application.Current.Resources["TextOnAccentFillColorPrimary"] = 
+//                     Color.FromArgb( 0xFF, 0xFF, 0xFF, 0xFF);
             
-            Application.Current.Resources["TextOnAccentFillColorSecondary"] = 
-                    Color.FromArgb( 0x80, 0xFF, 0xFF, 0xFF);
+//             Application.Current.Resources["TextOnAccentFillColorSecondary"] = 
+//                     Color.FromArgb( 0x80, 0xFF, 0xFF, 0xFF);
             
-            Application.Current.Resources["TextOnAccentFillColorDisabled"] = 
-                    Color.FromArgb( 0x87, 0xFF, 0xFF, 0xFF);
+//             Application.Current.Resources["TextOnAccentFillColorDisabled"] = 
+//                     Color.FromArgb( 0x87, 0xFF, 0xFF, 0xFF);
             
-            Application.Current.Resources["TextOnAccentFillColorSelectedText"] = 
-                    Color.FromArgb( 0xFF, 0xFF, 0xFF, 0xFF);
+//             Application.Current.Resources["TextOnAccentFillColorSelectedText"] = 
+//                     Color.FromArgb( 0xFF, 0xFF, 0xFF, 0xFF);
             
-            Application.Current.Resources["AccentTextFillColorDisabled"] = 
-                    Color.FromArgb( 0x5D, 0xFF, 0xFF, 0xFF);
-        }
+//             Application.Current.Resources["AccentTextFillColorDisabled"] = 
+//                     Color.FromArgb( 0x5D, 0xFF, 0xFF, 0xFF);
+//         }
 
         Application.Current.Resources["SystemAccentColor"] = systemAccent;
         Application.Current.Resources["SystemAccentColorPrimary"] = primaryAccent;

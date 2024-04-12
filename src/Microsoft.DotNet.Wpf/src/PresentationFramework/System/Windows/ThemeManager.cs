@@ -40,8 +40,8 @@ internal static class ThemeManager
             _currentApplicationTheme = GetSystemTheme();
             _currentUseLightMode = IsSystemThemeLight();
 
-            var themeColorResourceUri = GetFluentWindowThemeColorResourceUri(_currentApplicationTheme, _currentUseLightMode);
-            Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = themeColorResourceUri });
+            // var themeColorResourceUri = GetFluentWindowThemeColorResourceUri(_currentApplicationTheme, _currentUseLightMode);
+            // Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = themeColorResourceUri });
 
             DwmColorization.UpdateAccentColors();
             _isFluentWindowsThemeInitialized = true;
@@ -195,14 +195,14 @@ internal static class ThemeManager
         ResourceDictionary currentDictionary = Application.Current?.Resources;
         foreach (var key in newDictionary.Keys)
         {
-            if (currentDictionary.Contains(key))
+            if (true)
             {
                 currentDictionary[key] = newDictionary[key];
             }
-            else
-            {
-                currentDictionary.Add(key, newDictionary[key]);
-            }
+            // else
+            // {
+            //     currentDictionary.Add(key, newDictionary[key]);
+            // }
         }
     }
 
